@@ -10,7 +10,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mlfreeman.dsexplorer.search.AbstractMemoryListener;
 import org.mlfreeman.winapi.constants.DwDesiredAccess;
-import org.mlfreeman.winapi.constants.GAFlags;
 import org.mlfreeman.winapi.jna.User32;
 import org.mlfreeman.winapi.tools.Kernel32Tools;
 import org.mlfreeman.winapi.tools.PsapiTools;
@@ -24,6 +23,7 @@ import com.sun.jna.platform.win32.Tlhelp32.PROCESSENTRY32;
 import com.sun.jna.platform.win32.WinDef.HICON;
 import com.sun.jna.platform.win32.WinDef.HMODULE;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinNT.MEMORY_BASIC_INFORMATION;
 import com.sun.jna.ptr.IntByReference;
@@ -136,7 +136,7 @@ public class Process
         {
             if (hWnds.size() > 0)
             {
-                hIcon = User32Tools.getHIcon(User32.INSTANCE.GetAncestor(hWnds.get(0), GAFlags.GA_ROOTOWNER.getValue()));
+                hIcon = User32Tools.getHIcon(User32.INSTANCE.GetAncestor(hWnds.get(0), User32.GA_ROOTOWNER));
             }
             
         }
@@ -267,11 +267,11 @@ public class Process
         
         for (long regionBegin = from; regionBegin < to;)
         {
-            info = VirtualQueryEx(Pointer.createConstant(regionBegin));
+            info = Kernel32Tools.VirtualQueryEx(getHandle(), Pointer.createConstant(regionBegin));
             maxRegionSize = Math.max(maxRegionSize, info.regionSize.intValue());
             regionEnd = regionBegin + info.regionSize.intValue();
             
-            if (info.state.intValue() == Kernel32Tools.MEM_COMMIT && (info.protect.intValue() & Kernel32Tools.PAGE_NOACCESS) == 0 && (info.protect.intValue() & Kernel32Tools.PAGE_GUARD) == 0 && (info.protect.intValue() & Kernel32Tools.PAGE_EXECUTE_READ) == 0 && (info.protect.intValue() & Kernel32Tools.PAGE_READONLY) == 0)
+            if (info.state.intValue() == WinNT.MEM_COMMIT && (info.protect.intValue() & Kernel32Tools.PAGE_NOACCESS) == 0 && (info.protect.intValue() & Kernel32Tools.PAGE_GUARD) == 0 && (info.protect.intValue() & WinNT.PAGE_EXECUTE_READ) == 0 && (info.protect.intValue() & WinNT.PAGE_READONLY) == 0)
             {
                 log.trace("Region:\t" + Long.toHexString(regionBegin) + " - " + Long.toHexString(regionBegin + info.regionSize.intValue()));
                 
@@ -309,16 +309,6 @@ public class Process
         search(from, to);
         
         log.debug("timer " + (System.currentTimeMillis() - timer));
-    }
-    
-    public MEMORY_BASIC_INFORMATION VirtualQueryEx(Pointer lpAddress)
-    {
-        return Kernel32Tools.VirtualQueryEx(getHandle(), lpAddress);
-    }
-    
-    public void WriteProcessMemory(Pointer pAddress, Pointer inputBuffer, int nSize, IntByReference outNumberOfBytesWritten)
-    {
-        Kernel32Tools.WriteProcessMemory(getHandle(), pAddress, inputBuffer, nSize, outNumberOfBytesWritten);
     }
     
     // TODO stop search function

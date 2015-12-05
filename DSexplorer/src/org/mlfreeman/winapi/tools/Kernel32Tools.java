@@ -24,26 +24,31 @@ import com.sun.jna.ptr.IntByReference;
 
 public abstract class Kernel32Tools
 {
-    public static int MEM_COMMIT             = 0x01000;
-                                             
-    public static int MEM_FREE               = 0x10000;
-                                             
-    public static int MEM_RESERVE            = 0x02000;
-                                             
-    public static int PAGE_EXECUTE           = 0x0010; // 000 0001 0000
-                                             
-    public static int PAGE_EXECUTE_READ      = 0x0020; // 000 0010 0000
-    public static int PAGE_EXECUTE_READWRITE = 0x0040; // 000 0100 0000
-    public static int PAGE_EXECUTE_WRITECOPY = 0x0080; // 000 1000 0000
-                                             
-    public static int PAGE_GUARD             = 0x0100; // 001 0000 0000
-    public static int PAGE_NOACCESS          = 0x0001; // 000 0000 0001
-    public static int PAGE_NOCACHE           = 0x0200; // 010 0000 0000
-    public static int PAGE_READONLY          = 0x0002; // 000 0000 0010
-    public static int PAGE_READWRITE         = 0x0004; // 000 0000 0100
-    public static int PAGE_WRITECOMBINE      = 0x0400; // 100 0000 0000
-    public static int PAGE_WRITECOPY         = 0x0008; // 000 0000 1000
-                                             
+    
+    /**
+     * Pages in the region become guard pages. <br>
+     * Any attempt to access a guard page causes the system to raise a STATUS_GUARD_PAGE_VIOLATION exception and turn off the guard page status. <br>
+     * Guard pages thus act as a one-time access alarm. <br>
+     * For more information, see Creating Guard Pages. <br>
+     * When an access attempt leads the system to turn off guard page status, the underlying page protection takes over.<br>
+     * If a guard page exception occurs during a system service, the service typically returns a failure status indicator. <br>
+     * This value cannot be used with PAGE_NOACCESS. This flag is not supported by the CreateFileMapping function.
+     * 
+     * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx">MSDN</a>
+     */
+    // belongs in WinNT.h
+    public static int PAGE_GUARD    = 0x100;
+                                    
+    /**
+     * Disables all access to the committed region of pages.<br>
+     * An attempt to read from, write to, or execute the committed region results in an access violation.<br>
+     * This flag is not supported by the CreateFileMapping function.
+     * 
+     * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx">MSDN</a>
+     */
+    // belongs in WinNT.h
+    public static int PAGE_NOACCESS = 0x100;
+                                    
     public static ProcessList getProcessList()
     {
         ProcessList plist = new ProcessList();
