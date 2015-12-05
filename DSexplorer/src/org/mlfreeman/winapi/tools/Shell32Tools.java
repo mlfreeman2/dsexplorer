@@ -9,7 +9,7 @@ public abstract class Shell32Tools
     public static Pointer ExtractSmallIcon(String lpszFile, int nIconIndex)
     {
         Pointer[] hIcons = new Pointer[1];
-        Shell32.INSTANCE.ExtractIconExA(lpszFile, 0, null, hIcons, nIconIndex);
+        Shell32.INSTANCE.ExtractIconEx(lpszFile, 0, null, hIcons, nIconIndex);
         return hIcons[0];
     }
     

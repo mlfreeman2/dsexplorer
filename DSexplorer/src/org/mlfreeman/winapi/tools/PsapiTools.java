@@ -38,7 +38,7 @@ public abstract class PsapiTools
     {
         Memory lpImageFileName = new Memory(512);
         Psapi.INSTANCE.GetModuleFileNameEx(hProcess, hModule, lpImageFileName, 256);
-        return Native.toString(lpImageFileName.getByteArray(0, 512));
+        return Native.toString(lpImageFileName.getCharArray(0, 256));
     }
     
     public static String GetProcessImageFileName(HANDLE hProcess)

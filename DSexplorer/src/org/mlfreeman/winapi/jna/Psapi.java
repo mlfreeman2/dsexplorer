@@ -9,6 +9,7 @@ import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.WinDef.HMODULE;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.win32.W32APIOptions;
 
 public interface Psapi extends com.sun.jna.platform.win32.Psapi
 {
@@ -28,7 +29,7 @@ public interface Psapi extends com.sun.jna.platform.win32.Psapi
         }
     }
     
-    Psapi INSTANCE = (Psapi) Native.loadLibrary("Psapi", Psapi.class);
+    Psapi INSTANCE = (Psapi) Native.loadLibrary("Psapi", Psapi.class, W32APIOptions.DEFAULT_OPTIONS);
     
     /*
      * http://msdn.microsoft.com/en-us/library/ms682631(VS.85).aspx

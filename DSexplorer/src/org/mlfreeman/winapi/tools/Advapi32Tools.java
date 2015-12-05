@@ -10,6 +10,7 @@ import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinNT.HANDLEByReference;
 import com.sun.jna.platform.win32.WinNT.LUID;
+import com.sun.jna.platform.win32.WinNT.LUID_AND_ATTRIBUTES;
 import com.sun.jna.platform.win32.WinNT.TOKEN_PRIVILEGES;
 
 public abstract class Advapi32Tools
@@ -41,8 +42,7 @@ public abstract class Advapi32Tools
         }
         
         TOKEN_PRIVILEGES tkp = new TOKEN_PRIVILEGES(1);
-        tkp.Privileges[0].Luid = luid;
-        tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        tkp.Privileges[0] = new LUID_AND_ATTRIBUTES(luid, SE_PRIVILEGE_ENABLED);
         success = Advapi32.INSTANCE.AdjustTokenPrivileges(hToken.getValue(), false, tkp, 0, null, null);
         if (!success)
         {

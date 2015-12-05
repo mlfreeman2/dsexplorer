@@ -73,9 +73,9 @@ public class User32Tools
         return image;
     }
     
-    private static int GetClassLong(HWND hWnd, int nIndex) throws Exception
+    private static long GetClassLong(HWND hWnd, int nIndex) throws Exception
     {
-        int ret = User32.INSTANCE.GetClassLong(hWnd, nIndex);
+        long ret = User32.INSTANCE.GetClassLong(hWnd, nIndex);
         if (ret == 0)
         {
             throw new Win32Exception(Native.getLastError());
@@ -91,7 +91,7 @@ public class User32Tools
         try
         {
             Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL, 0, fuFlags.getFlags(), 20);
-            if (icon != null)
+            if (Pointer.nativeValue(icon) != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(icon));
             }
@@ -103,7 +103,7 @@ public class User32Tools
         try
         {
             Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_BIG, 0, fuFlags.getFlags(), 20);
-            if (icon != null)
+            if (Pointer.nativeValue(icon) != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(icon));
             }
@@ -115,7 +115,7 @@ public class User32Tools
         try
         {
             Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL2, 0, fuFlags.getFlags(), 20);
-            if (icon != null)
+            if (Pointer.nativeValue(icon) != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(icon));
             }
@@ -126,7 +126,7 @@ public class User32Tools
         
         try
         {
-            int hiconSM = GetClassLong(hWnd, User32.GCL_HICONSM);
+            long hiconSM = GetClassLong(hWnd, User32.GCL_HICONSM);
             if (hiconSM != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(Pointer.createConstant(hiconSM)));
@@ -138,7 +138,7 @@ public class User32Tools
         
         try
         {
-            int hicon = GetClassLong(hWnd, User32.GCL_HICON);
+            long hicon = GetClassLong(hWnd, User32.GCL_HICON);
             if (hicon != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(Pointer.createConstant(hicon)));

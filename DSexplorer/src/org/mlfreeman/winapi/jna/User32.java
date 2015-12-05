@@ -1,6 +1,7 @@
 package org.mlfreeman.winapi.jna;
 
 import com.sun.jna.Native;
+import com.sun.jna.win32.W32APIOptions;
 
 public interface User32 extends com.sun.jna.platform.win32.User32
 {
@@ -29,7 +30,7 @@ public interface User32 extends com.sun.jna.platform.win32.User32
     // belongs in WinUser.h
     int    GCL_HICONSM  = -34;
                         
-    User32 INSTANCE     = (User32) Native.loadLibrary("user32", User32.class);
+    User32 INSTANCE     = (User32) Native.loadLibrary("user32", User32.class, W32APIOptions.DEFAULT_OPTIONS);
                         
     /*
      * http://msdn.microsoft.com/en-us/library/ms648058(S.85).aspx
