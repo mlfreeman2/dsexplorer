@@ -33,7 +33,7 @@ public class ResultTable extends JTable
     private static class MyTableModel extends AbstractTableModel
     {
         private static final long serialVersionUID = 7780019195084742274L;
-        @SuppressWarnings("unchecked")
+                                                   
         private Class[]           classes          = {String.class, Integer.class};
         private String[]          columnNames      = {"Address", "Value"};
         private ResultList        list;

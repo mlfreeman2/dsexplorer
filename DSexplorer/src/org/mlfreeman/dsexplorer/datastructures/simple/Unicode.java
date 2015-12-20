@@ -18,7 +18,7 @@ public class Unicode extends DefaultDatastructure
     @Override
     public Object eval(Memory buffer)
     {
-        return buffer.getString(0, true).substring(0, byteCount / 2);
+        return buffer.getWideString(0).substring(0, byteCount / 2);
     }
     
     @Override

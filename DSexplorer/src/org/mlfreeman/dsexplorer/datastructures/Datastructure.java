@@ -5,7 +5,7 @@ import com.sun.jna.Memory;
 public interface Datastructure
 {
     
-    public void addListener(DSListener listener);
+    public void addListener(Result listener);
     
     public Object eval(Memory buffer);
     
@@ -21,7 +21,7 @@ public interface Datastructure
     
     public boolean isContainer();
     
-    public void removeListener(DSListener listener);
+    public void removeListener(Result listener);
     
     public void setByteCount(int byteCount);
     

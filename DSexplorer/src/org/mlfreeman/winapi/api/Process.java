@@ -9,12 +9,11 @@ import javax.swing.ImageIcon;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mlfreeman.dsexplorer.search.AbstractMemoryListener;
-import org.mlfreeman.winapi.constants.DwDesiredAccess;
 import org.mlfreeman.winapi.jna.User32;
-import org.mlfreeman.winapi.tools.Kernel32Tools;
-import org.mlfreeman.winapi.tools.PsapiTools;
-import org.mlfreeman.winapi.tools.Shell32Tools;
-import org.mlfreeman.winapi.tools.User32Tools;
+import org.mlfreeman.winapi.jna.util.Kernel32Util;
+import org.mlfreeman.winapi.jna.util.PsapiUtil;
+import org.mlfreeman.winapi.jna.util.Shell32Util;
+import org.mlfreeman.winapi.jna.util.User32Util;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -31,27 +30,27 @@ import com.sun.jna.ptr.IntByReference;
 public class Process
 {
     private static final Log       log         = LogFactory.getLog(Process.class);
-
+                                               
     private final int              cntThreads;
-
+                                   
     private HANDLE                 handleCache = null;
-
+                                               
     private List<HWND>             hWnds       = new LinkedList<HWND>();
-
+                                               
     private ImageIcon              iconCache   = null;
-
+                                               
     private AbstractMemoryListener listener;
-
+                                   
     private Module                 moduleCache = null;
-
+                                               
     private final int              pcPriClassBase;
-
+                                   
     private final int              pid;
-
+                                   
     private final String           szExeFile;
-
+                                   
     private final int              th32ParentProcessID;
-
+                                   
     public Process(PROCESSENTRY32 pe32)
     {
         pid = pe32.th32ProcessID.intValue();
@@ -60,12 +59,12 @@ public class Process
         pcPriClassBase = pe32.pcPriClassBase.intValue();
         th32ParentProcessID = pe32.th32ParentProcessID.intValue();
     }
-
-    public void addHwnd(HWND hWnd)
+    
+    void addHwnd(HWND hWnd)
     {
         hWnds.add(hWnd);
     }
-
+    
     @Override
     public boolean equals(Object obj)
     {
@@ -86,7 +85,7 @@ public class Process
         
         return true;
     }
-
+    
     public Pointer getBase()
     {
         Module module = getModule();
@@ -99,29 +98,28 @@ public class Process
             return Pointer.NULL;
         }
     }
-
+    
     public int getCntThreads()
     {
         return cntThreads;
     }
-
+    
     public HANDLE getHandle()
     {
         if (handleCache != null)
         {
             return handleCache;
         }
-        DwDesiredAccess dwDesiredAccess = new DwDesiredAccess();
-        dwDesiredAccess.setPROCESS_ALL_ACCESS();
-        handleCache = Kernel32Tools.OpenProcess(dwDesiredAccess, false, pid);
+        
+        handleCache = Kernel32Util.OpenProcess(Kernel32Util.PROCESS_ALL_ACCESS, false, pid);
         return handleCache;
     }
-
+    
     public List<HWND> getHwnds()
     {
         return hWnds;
     }
-
+    
     public ImageIcon getIcon()
     {
         if (iconCache != null)
@@ -130,34 +128,34 @@ public class Process
         }
         
         HICON hIcon = null;
-
-        Pointer attempt_1 = Shell32Tools.ExtractSmallIcon(getModuleFileNameExA(), 1);
+        
+        Pointer attempt_1 = Shell32Util.ExtractSmallIcon(getModuleFileNameExA(), 1);
         if (attempt_1 != null)
         {
             hIcon = new HICON(attempt_1);
         }
-
+        
         if (hIcon == null)
         {
-            Pointer attempt_2 = Shell32Tools.ExtractSmallIcon(szExeFile, 1);
+            Pointer attempt_2 = Shell32Util.ExtractSmallIcon(szExeFile, 1);
             if (attempt_2 != null)
             {
                 hIcon = new HICON(attempt_2);
             }
         }
-
+        
         if (hIcon == null)
         {
             if (hWnds.size() > 0)
             {
-                hIcon = User32Tools.getHIcon(User32.INSTANCE.GetAncestor(hWnds.get(0), User32.GA_ROOTOWNER));
+                hIcon = User32Util.getHIcon(User32.INSTANCE.GetAncestor(hWnds.get(0), User32.GA_ROOTOWNER));
             }
-
+            
         }
-
+        
         if (hIcon != null)
         {
-            iconCache = new ImageIcon(User32Tools.getIcon(hIcon));
+            iconCache = new ImageIcon(User32Util.getIcon(hIcon));
         }
         else
         {
@@ -165,7 +163,7 @@ public class Process
         }
         return iconCache;
     }
-
+    
     public Module getModule()
     {
         if (moduleCache != null)
@@ -181,25 +179,25 @@ public class Process
         
         return moduleCache;
     }
-
+    
     public String getModuleFileNameExA()
     {
         try
         {
-            return PsapiTools.GetModuleFileNameEx(getHandle(), null);
+            return PsapiUtil.GetModuleFileNameEx(getHandle(), null);
         }
         catch (Exception e)
         {
             return "";
         }
     }
-
+    
     public List<Module> getModules()
     {
         // TODO add modules cache?
         try
         {
-            List<HMODULE> pointers = PsapiTools.EnumProcessModules(getHandle());
+            List<HMODULE> pointers = PsapiUtil.EnumProcessModules(getHandle());
             List<Module> modules = new LinkedList<Module>();
             for (HMODULE hModule : pointers)
             {
@@ -212,29 +210,29 @@ public class Process
             return null;
         }
     }
-
+    
     public int getPcPriClassBase()
     {
         return pcPriClassBase;
     }
-
+    
     public int getPid()
     {
         return pid;
     }
-
+    
     public String getProcessImageFileName()
     {
         try
         {
-            return PsapiTools.GetProcessImageFileName(getHandle());
+            return PsapiUtil.GetProcessImageFileName(getHandle());
         }
         catch (Exception e)
         {
             return "";
         }
     }
-
+    
     public int getSize()
     {
         Module module = getModule();
@@ -247,7 +245,7 @@ public class Process
             return 0;
         }
     }
-
+    
     public String getStatic(Long address)
     {
         if (address == null)
@@ -269,22 +267,22 @@ public class Process
         }
         return null;
     }
-
+    
     public String getSzExeFile()
     {
         return szExeFile;
     }
-
+    
     public int getTh32ParentProcessID()
     {
         return th32ParentProcessID;
     }
-
+    
     public void ReadProcessMemory(Pointer pAddress, Pointer outputBuffer, int nSize, IntByReference outNumberOfBytesRead)
     {
-        Kernel32Tools.ReadProcessMemory(getHandle(), pAddress, outputBuffer, nSize, outNumberOfBytesRead);
+        Kernel32Util.ReadProcessMemory(getHandle(), pAddress, outputBuffer, nSize, outNumberOfBytesRead);
     }
-
+    
     private void search(long from, long to)
     {
         int partSize = 512 * 1024;
@@ -294,17 +292,17 @@ public class Process
         MEMORY_BASIC_INFORMATION info;
         Memory outputBuffer = new Memory(bufferSize);
         long maxRegionSize = 0;
-
+        
         for (long regionBegin = from; regionBegin < to;)
         {
-            info = Kernel32Tools.VirtualQueryEx(getHandle(), Pointer.createConstant(regionBegin));
+            info = Kernel32Util.VirtualQueryEx(getHandle(), Pointer.createConstant(regionBegin));
             maxRegionSize = Math.max(maxRegionSize, info.regionSize.intValue());
             regionEnd = regionBegin + info.regionSize.intValue();
-
-            if (info.state.intValue() == WinNT.MEM_COMMIT && (info.protect.intValue() & Kernel32Tools.PAGE_NOACCESS) == 0 && (info.protect.intValue() & Kernel32Tools.PAGE_GUARD) == 0 && (info.protect.intValue() & WinNT.PAGE_EXECUTE_READ) == 0 && (info.protect.intValue() & WinNT.PAGE_READONLY) == 0)
+            
+            if (info.state.intValue() == WinNT.MEM_COMMIT && (info.protect.intValue() & Kernel32Util.PAGE_NOACCESS) == 0 && (info.protect.intValue() & Kernel32Util.PAGE_GUARD) == 0 && (info.protect.intValue() & WinNT.PAGE_EXECUTE_READ) == 0 && (info.protect.intValue() & WinNT.PAGE_READONLY) == 0)
             {
                 Process.log.trace("Region:\t" + Long.toHexString(regionBegin) + " - " + Long.toHexString(regionBegin + info.regionSize.intValue()));
-
+                
                 for (long regionPart = regionBegin; regionPart < regionEnd; regionPart = regionPart + partSize)
                 {
                     if (regionPart + bufferSize < regionEnd)
@@ -332,20 +330,20 @@ public class Process
         }
         Process.log.debug("maxRegionSize " + maxRegionSize / 1024 + " kB");
     }
-
+    
     public synchronized void search(long from, long to, final Object value, AbstractMemoryListener listener)
     {
         Process.log.debug("search from " + Long.toHexString(from) + " to " + Long.toHexString(to) + " value " + value + " listener " + listener);
         this.listener = listener;
         long timer = System.currentTimeMillis();
-
+        
         this.listener.init(value);
         search(from, to);
-
+        
         Process.log.debug("timer " + (System.currentTimeMillis() - timer));
     }
-
+    
     // TODO stop search function
     // TODO search function progess
-
+    
 }

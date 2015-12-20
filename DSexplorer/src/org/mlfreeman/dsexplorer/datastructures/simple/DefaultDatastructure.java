@@ -3,7 +3,7 @@ package org.mlfreeman.dsexplorer.datastructures.simple;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.mlfreeman.dsexplorer.datastructures.DSListener;
+import org.mlfreeman.dsexplorer.datastructures.Result;
 import org.mlfreeman.dsexplorer.datastructures.DSType;
 import org.mlfreeman.dsexplorer.datastructures.Datastructure;
 import org.simpleframework.xml.Attribute;
@@ -17,7 +17,7 @@ public abstract class DefaultDatastructure implements Datastructure
     @Attribute
     protected int            byteCount    = 0;
     protected boolean        byteCountFix = true;
-    private List<DSListener> listeners    = new LinkedList<DSListener>();
+    private List<Result> listeners    = new LinkedList<Result>();
     @Attribute
     protected String         name         = "";
     private Datastructure    parent;                                     // needs to be reconstructed after loading
@@ -27,7 +27,7 @@ public abstract class DefaultDatastructure implements Datastructure
     }
     
     @Override
-    public void addListener(DSListener listener)
+    public void addListener(Result listener)
     {
         listeners.add(listener);
     }
@@ -69,7 +69,7 @@ public abstract class DefaultDatastructure implements Datastructure
     }
     
     @Override
-    public void removeListener(DSListener listener)
+    public void removeListener(Result listener)
     {
         listeners.remove(listener);
     }

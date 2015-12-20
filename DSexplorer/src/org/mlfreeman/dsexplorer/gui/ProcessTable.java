@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.mlfreeman.winapi.api.Process;
 import org.mlfreeman.winapi.api.ProcessList;
-import org.mlfreeman.winapi.tools.Kernel32Tools;
+import org.mlfreeman.winapi.jna.util.Kernel32Util;
 
 public class ProcessTable extends JTable
 {
@@ -82,7 +82,7 @@ public class ProcessTable extends JTable
         
         public void refresh()
         {
-            list = Kernel32Tools.getProcessList();
+            list = Kernel32Util.getProcessList();
             fireTableDataChanged();
         }
     }

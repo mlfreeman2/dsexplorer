@@ -1,8 +1,7 @@
-package org.mlfreeman.winapi.tools;
+package org.mlfreeman.winapi.jna.util;
 
 import java.awt.image.BufferedImage;
 
-import org.mlfreeman.winapi.constants.FuFlags;
 import org.mlfreeman.winapi.jna.User32;
 
 import com.sun.jna.Memory;
@@ -20,7 +19,7 @@ import com.sun.jna.platform.win32.WinGDI.BITMAPINFOHEADER;
 import com.sun.jna.platform.win32.WinGDI.ICONINFO;
 import com.sun.jna.platform.win32.WinUser;
 
-public class User32Tools
+public class User32Util
 {
     
     public static BufferedImage getIcon(HICON hIcon)
@@ -44,9 +43,9 @@ public class User32Tools
         HDC hDC = User32.INSTANCE.GetDC(null);
         ICONINFO piconinfo = new ICONINFO();
         User32.INSTANCE.GetIconInfo(hIcon, piconinfo);
-        // the 0 at the end is DIB_RGB_COLORS
-        GDI32.INSTANCE.GetDIBits(hDC, piconinfo.hbmColor, 0, height, lpBitsColor, info, 0);
-        GDI32.INSTANCE.GetDIBits(hDC, piconinfo.hbmMask, 0, height, lpBitsMask, info, 0);
+        
+        GDI32.INSTANCE.GetDIBits(hDC, piconinfo.hbmColor, 0, height, lpBitsColor, info, WinGDI.DIB_RGB_COLORS);
+        GDI32.INSTANCE.GetDIBits(hDC, piconinfo.hbmMask, 0, height, lpBitsMask, info, WinGDI.DIB_RGB_COLORS);
         
         int r, g, b, a, argb;
         int x = 0, y = height - 1;
@@ -56,7 +55,7 @@ public class User32Tools
             g = lpBitsColor.getByte(i + 1) & 0xFF;
             r = lpBitsColor.getByte(i + 2) & 0xFF;
             a = 0xFF - lpBitsMask.getByte(i) & 0xFF;
-            // System.out.println(lpBitsMask[i]+" "+lpBitsMask[i+1]+" "+lpBitsMask[i+2]);
+            
             argb = a << 24 | r << 16 | g << 8 | b;
             image.setRGB(x, y, argb);
             x = (x + 1) % width;
@@ -85,12 +84,9 @@ public class User32Tools
     
     public static HICON getHIcon(HWND hWnd)
     {
-        FuFlags fuFlags = new FuFlags();
-        fuFlags.setSMTO_NORMAL();
-        
         try
         {
-            Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL, 0, fuFlags.getFlags(), 20);
+            Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL, 0, WinUser.SMTO_NORMAL, 20);
             if (Pointer.nativeValue(icon) != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(icon));
@@ -102,7 +98,7 @@ public class User32Tools
         
         try
         {
-            Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_BIG, 0, fuFlags.getFlags(), 20);
+            Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_BIG, 0, WinUser.SMTO_NORMAL, 20);
             if (Pointer.nativeValue(icon) != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(icon));
@@ -114,7 +110,7 @@ public class User32Tools
         
         try
         {
-            Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL2, 0, fuFlags.getFlags(), 20);
+            Pointer icon = SendMessageTimeoutA(hWnd, WinUser.WM_GETICON, WinUser.ICON_SMALL2, 0, WinUser.SMTO_NORMAL, 20);
             if (Pointer.nativeValue(icon) != 0)
             {
                 return User32.INSTANCE.CopyIcon(new HICON(icon));

@@ -1,13 +1,13 @@
 package org.mlfreeman.winapi.api;
 
 import org.mlfreeman.winapi.jna.Psapi.LPMODULEINFO;
-import org.mlfreeman.winapi.tools.PsapiTools;
+import org.mlfreeman.winapi.jna.util.PsapiUtil;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinDef.HMODULE;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 
-public class Module
+class Module
 {
     private HANDLE  hProcess;
     private HMODULE hModule;
@@ -19,7 +19,7 @@ public class Module
     {
     }
     
-    public Module(HANDLE hProcess, HMODULE hModule)
+    Module(HANDLE hProcess, HMODULE hModule)
     {
         this.hProcess = hProcess;
         this.hModule = hModule;
@@ -32,7 +32,7 @@ public class Module
     
     public String getFileName()
     {
-        return PsapiTools.GetModuleFileNameEx(hProcess, hModule);
+        return PsapiUtil.GetModuleFileNameEx(hProcess, hModule);
     }
     
     private void GetModuleInformation()
@@ -41,7 +41,7 @@ public class Module
         {
             try
             {
-                LPMODULEINFO x = PsapiTools.GetModuleInformation(hProcess, hModule);
+                LPMODULEINFO x = PsapiUtil.GetModuleInformation(hProcess, hModule);
                 lpBaseOfDll = x.lpBaseOfDll;
                 SizeOfImage = x.SizeOfImage;
                 EntryPoint = x.EntryPoint;

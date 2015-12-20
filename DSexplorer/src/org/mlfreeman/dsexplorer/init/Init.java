@@ -7,7 +7,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mlfreeman.dsexplorer.gui.MainWindow;
-import org.mlfreeman.winapi.tools.Advapi32Tools;
+import org.mlfreeman.winapi.jna.util.Advapi32Util;
 
 import com.sun.jna.platform.win32.Kernel32;
 
@@ -40,7 +40,7 @@ public class Init
         
         try
         {
-            Advapi32Tools.enableDebugPrivilege(Kernel32.INSTANCE.GetCurrentProcess());
+            Advapi32Util.enableDebugPrivilege(Kernel32.INSTANCE.GetCurrentProcess());
         }
         catch (Exception e)
         {

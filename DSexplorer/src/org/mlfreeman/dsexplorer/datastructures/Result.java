@@ -18,28 +18,28 @@ import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
 
 @Root
-public class Result implements TreeNode, DSListener, Cloneable
+public class Result implements TreeNode, Cloneable
 {
     private static final Log log               = LogFactory.getLog(Result.class);
-    
+                                               
     @Attribute(required = false)
     private Long             address;
-    
+                             
     private List<Result>     childs;
-    
+                             
     @Element
     private Datastructure    datastructure;
                              
     private int              fieldIndex;                                         // only for fields. used to calcualte the Offset
-
+                             
     private TreeNode         parent;                                             // needs to be reconstructed after loading
                              
     private Long             pointerCache      = null;
-    
+                                               
     private boolean          pointerCacheOK    = false;
                                                
     private ResultList       resultList;                                         // needs to be reconstructed after loading
-    
+                             
     private String           staticAddr        = null;
                                                
     private boolean          staticAddrCacheOK = false;
@@ -84,7 +84,6 @@ public class Result implements TreeNode, DSListener, Cloneable
     }
     
     // triggered on the parent of the added field
-    @Override
     public void addedField(Datastructure field, int fieldIndex)
     {
         if (childs != null)
@@ -298,7 +297,7 @@ public class Result implements TreeNode, DSListener, Cloneable
         return null;
     }
     
-    // DSListener///////////////////////////////////////////////
+    // Result///////////////////////////////////////////////
     
     public String getPointerString()
     {
@@ -371,7 +370,6 @@ public class Result implements TreeNode, DSListener, Cloneable
         return v == null ? null : getDatastructure().valueToString(v);
     }
     
-    @Override
     public void hasChanged()
     {
         valueCacheOK = false;
@@ -433,7 +431,6 @@ public class Result implements TreeNode, DSListener, Cloneable
         return parent.equals(resultList);
     }
     
-    @Override
     public void pointerChanged(boolean pointer)
     {
         invalidateParentAndChilds();
@@ -448,7 +445,6 @@ public class Result implements TreeNode, DSListener, Cloneable
     }
     
     // triggered on the parent of the removed field
-    @Override
     public void removedField(int fieldIndex)
     {
         if (childs != null)
@@ -469,7 +465,6 @@ public class Result implements TreeNode, DSListener, Cloneable
     }
     
     // triggered on the parent of the removed field
-    @Override
     public void replacedField(Datastructure oldField, Datastructure newField, int fieldIndex)
     {
         if (childs != null)

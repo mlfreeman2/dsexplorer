@@ -1,4 +1,4 @@
-package org.mlfreeman.winapi.tools;
+package org.mlfreeman.winapi.jna.util;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.sun.jna.platform.win32.WinDef.HMODULE;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 
-public abstract class PsapiTools
+public abstract class PsapiUtil
 {
     public static List<HMODULE> EnumProcessModules(HANDLE hProcess) throws Exception
     {
@@ -21,11 +21,12 @@ public abstract class PsapiTools
         
         HMODULE[] lphModule = new HMODULE[100 * 4];
         IntByReference lpcbNeededs = new IntByReference();
-        boolean success = Psapi.INSTANCE.EnumProcessModules(hProcess, lphModule, lphModule.length, lpcbNeededs);
-        if (!success)
+        
+        if (!Psapi.INSTANCE.EnumProcessModules(hProcess, lphModule, lphModule.length, lpcbNeededs))
         {
             throw new Win32Exception(Native.getLastError());
         }
+        
         for (int i = 0; i < lpcbNeededs.getValue() / 4; i++)
         {
             list.add(lphModule[i]);
@@ -52,8 +53,7 @@ public abstract class PsapiTools
     {
         LPMODULEINFO lpmodinfo = new LPMODULEINFO();
         
-        boolean success = Psapi.INSTANCE.GetModuleInformation(hProcess, hModule, lpmodinfo, lpmodinfo.size());
-        if (!success)
+        if (!Psapi.INSTANCE.GetModuleInformation(hProcess, hModule, lpmodinfo, lpmodinfo.size()))
         {
             throw new Win32Exception(Native.getLastError());
         }

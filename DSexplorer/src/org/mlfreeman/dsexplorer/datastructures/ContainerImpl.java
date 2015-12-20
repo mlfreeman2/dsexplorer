@@ -20,7 +20,7 @@ public class ContainerImpl extends AbstractListModel implements Container
     private static final long   serialVersionUID = -7295827399382661392L;
     @ElementList(inline = true, required = false)
     private List<Datastructure> fields           = new LinkedList<Datastructure>();
-    private List<DSListener>    listeners        = new LinkedList<DSListener>();
+    private List<Result>    listeners        = new LinkedList<Result>();
     @Attribute
     private String              name             = "composed";
     private Datastructure       parent;                                                   // needs to be reconstructed after loading
@@ -30,8 +30,6 @@ public class ContainerImpl extends AbstractListModel implements Container
     public ContainerImpl()
     {
     };
-    
-    // Container///////////////////////////////////////////////
     
     @Override
     public void addField(Datastructure field)
@@ -57,7 +55,7 @@ public class ContainerImpl extends AbstractListModel implements Container
     }
     
     @Override
-    public void addListener(DSListener listener)
+    public void addListener(Result listener)
     {
         listeners.add(listener);
     }
@@ -176,7 +174,7 @@ public class ContainerImpl extends AbstractListModel implements Container
     }
     
     @Override
-    public void removeListener(DSListener listener)
+    public void removeListener(Result listener)
     {
         listeners.remove(listener);
     }

@@ -1,10 +1,10 @@
-package org.mlfreeman.winapi.tools;
+package org.mlfreeman.winapi.jna.util;
 
 import org.mlfreeman.winapi.jna.Shell32;
 
 import com.sun.jna.Pointer;
 
-public abstract class Shell32Tools
+public abstract class Shell32Util
 {
     public static Pointer ExtractSmallIcon(String lpszFile, int nIconIndex)
     {

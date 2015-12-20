@@ -1,11 +1,10 @@
-package org.mlfreeman.winapi.tools;
+package org.mlfreeman.winapi.jna.util;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import org.mlfreeman.winapi.api.Process;
 import org.mlfreeman.winapi.api.ProcessList;
-import org.mlfreeman.winapi.constants.DwDesiredAccess;
 import org.mlfreeman.winapi.jna.User32;
 
 import com.sun.jna.Native;
@@ -18,11 +17,12 @@ import com.sun.jna.platform.win32.Tlhelp32;
 import com.sun.jna.platform.win32.Tlhelp32.PROCESSENTRY32;
 import com.sun.jna.platform.win32.Win32Exception;
 import com.sun.jna.platform.win32.WinDef.DWORD;
+import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinNT.MEMORY_BASIC_INFORMATION;
 import com.sun.jna.ptr.IntByReference;
 
-public abstract class Kernel32Tools
+public abstract class Kernel32Util
 {
     
     /**
@@ -37,8 +37,8 @@ public abstract class Kernel32Tools
      * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx">MSDN</a>
      */
     // belongs in WinNT.h
-    public static int PAGE_GUARD    = 0x100;
-                                    
+    public static final int PAGE_GUARD         = 0x100;
+                                               
     /**
      * Disables all access to the committed region of pages.<br>
      * An attempt to read from, write to, or execute the committed region results in an access violation.<br>
@@ -47,8 +47,20 @@ public abstract class Kernel32Tools
      * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx">MSDN</a>
      */
     // belongs in WinNT.h
-    public static int PAGE_NOACCESS = 0x100;
-                                    
+    public static final int PAGE_NOACCESS      = 0x100;
+                                               
+    /**
+     * All possible access rights for a process object. Windows Server 2003 and Windows XP: The size of the PROCESS_ALL_ACCESS flag increased on Windows Server 2008 and Windows Vista. <br>
+     * If an application compiled for Windows Server 2008 and Windows Vista is run on Windows Server 2003 or Windows XP, the PROCESS_ALL_ACCESS flag is too large and the function specifying this flag fails with ERROR_ACCESS_DENIED.<br>
+     * To avoid this problem, specify the minimum set of access rights required for the operation.<br>
+     * If PROCESS_ALL_ACCESS must be used, set _WIN32_WINNT to the minimum operating system targeted by your application (for example, #define _WIN32_WINNT _WIN32_WINNT_WINXP).<br>
+     * For more information, see Using the Windows Headers.
+     * 
+     * @see <a href="https://msdn.microsoft.com/en-us/library/ms684880(v=VS.85).aspx">MSDN</a>
+     */
+    // belongs in WinNT.h
+    public static final int PROCESS_ALL_ACCESS = WinNT.PROCESS_CREATE_PROCESS | WinNT.PROCESS_CREATE_THREAD | WinNT.PROCESS_DUP_HANDLE | WinNT.PROCESS_QUERY_INFORMATION | WinNT.PROCESS_QUERY_LIMITED_INFORMATION | WinNT.PROCESS_SET_INFORMATION | WinNT.PROCESS_SET_QUOTA | WinNT.PROCESS_SUSPEND_RESUME | WinNT.PROCESS_SYNCHRONIZE | WinNT.PROCESS_TERMINATE | WinNT.PROCESS_VM_OPERATION | WinNT.PROCESS_VM_READ | WinNT.PROCESS_VM_WRITE | WinNT.DELETE | WinNT.READ_CONTROL | WinNT.WRITE_DAC | WinNT.WRITE_OWNER | WinNT.SYNCHRONIZE;
+                                               
     public static ProcessList getProcessList()
     {
         ProcessList plist = new ProcessList();
@@ -58,8 +70,7 @@ public abstract class Kernel32Tools
         HANDLE hProcessSnap = Kernel32.INSTANCE.CreateToolhelp32Snapshot(Tlhelp32.TH32CS_SNAPPROCESS, new DWORD(0));
         
         PROCESSENTRY32 pe32 = new PROCESSENTRY32();
-        boolean success = Kernel32.INSTANCE.Process32First(hProcessSnap, pe32);
-        if (!success)
+        if (!Kernel32.INSTANCE.Process32First(hProcessSnap, pe32))
         {
             throw new Win32Exception(Native.getLastError());
         }
@@ -78,6 +89,8 @@ public abstract class Kernel32Tools
             plist.add(new Process(pe));
         }
         
+        Kernel32.INSTANCE.CloseHandle(hProcessSnap);
+        
         List<DesktopWindow> windows = WindowUtils.getAllWindows(false);
         IntByReference lpdwProcessId = new IntByReference();
         int pid = 0;
@@ -91,9 +104,9 @@ public abstract class Kernel32Tools
         return plist;
     }
     
-    public static HANDLE OpenProcess(DwDesiredAccess dwDesiredAccess, boolean bInheritHandle, int dwProcessId)
+    public static HANDLE OpenProcess(int dwDesiredAccess, boolean bInheritHandle, int dwProcessId)
     {
-        HANDLE process = Kernel32.INSTANCE.OpenProcess(dwDesiredAccess.getFlags(), false, dwProcessId);
+        HANDLE process = Kernel32.INSTANCE.OpenProcess(dwDesiredAccess, false, dwProcessId);
         if (process == null)
         {
             throw new Win32Exception(Native.getLastError());
@@ -121,12 +134,5 @@ public abstract class Kernel32Tools
         return lpBuffer;
     }
     
-    public static void WriteProcessMemory(HANDLE hProcess, Pointer pAddress, Pointer inputBuffer, int nSize, IntByReference outNumberOfBytesWritten)
-    {
-        boolean success = Kernel32.INSTANCE.WriteProcessMemory(hProcess, pAddress, inputBuffer, nSize, outNumberOfBytesWritten);
-        if (!success)
-        {
-            throw new Win32Exception(Native.getLastError());
-        }
-    }
+    
 }
