@@ -47,7 +47,7 @@ public abstract class Kernel32Util
      * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa366786(v=vs.85).aspx">MSDN</a>
      */
     // belongs in WinNT.h
-    public static final int PAGE_NOACCESS      = 0x100;
+    public static final int PAGE_NOACCESS      = 0x01;
                                                
     /**
      * All possible access rights for a process object. Windows Server 2003 and Windows XP: The size of the PROCESS_ALL_ACCESS flag increased on Windows Server 2008 and Windows Vista. <br>
